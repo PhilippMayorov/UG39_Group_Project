@@ -1,0 +1,56 @@
+Group Project UG39 - File Setup Guide
+
+This guide shows the exact folder layout for this project so everyone keeps the same structure.
+
+Project root structure
+
+group*project_UG39/
+├── CAD_household_analysis.ipynb
+├── README
+├── DemoStats_2025_CSV_fixed/
+│ ├── DemoStats*(DST)_2020_2025_GEO.csv
+│ ├── DemoStats_(DST)_2025_2025_GEO.csv
+│ ├── DemoStats_(DST)_2028_2025_GEO.csv
+│ ├── DemoStats_(DST)_2030_2025_GEO.csv
+│ ├── DemoStats_(DST)_2035_2025_GEO.csv
+│ ├── DemoStats_2025_TRENDS_GEO.csv
+│ └── Documentation/
+│ ├── DemoStats 2025 - Metadata.csv
+│ └── DemoStats 2025 - Variables List.csv
+├── Documentation/
+│ ├── DemoStats 2024 - Metadata.csv
+│ ├── DemoStats 2024 - Variables Change List.csv
+│ ├── DemoStats 2024 - Variables List.csv
+│ ├── HouseholdSpend 2024 - Metadata.csv
+│ └── desktop.ini
+├── Geographic Hierarchy File_2025_CSV/
+│ ├── Geography_Hierarchy_File_2025.csv
+│ ├── Geography_Hierarchy_List_2025.csv
+│ └── Documentation/
+└── HouseholdSpend_2025_CSV_fixed/
+├── HouseholdSpend_(HHS)_2025_GEO_P1.csv
+├── HouseholdSpend_(HHS)\_2025_GEO_P2.csv
+└── Documentation/
+├── HouseholdSpend 2025 - Metadata.csv
+├── HouseholdSpend 2025 - Variables Change List.csv
+└── HouseholdSpend 2025 - Variables List.csv
+
+How teammates should set up files
+
+1. Clone or download the project into a folder named group_project_UG39.
+2. Keep all top-level folders exactly as shown above.
+3. Do not rename CSV files or move them between folders.
+4. Keep metadata and variable list files inside each Documentation folder.
+5. Open CAD_household_analysis.ipynb only after confirming this structure is in place.
+
+Quick verification checklist
+
+- The root has 4 data folders:
+  - DemoStats_2025_CSV_fixed
+  - Documentation
+  - Geographic Hierarchy File_2025_CSV
+  - HouseholdSpend_2025_CSV_fixed
+- The notebook CAD_household_analysis.ipynb is in the root.
+- Each dataset folder still contains its Documentation subfolder.
+
+If your files match this layout, your environment is set up correctly for the project notebook and analysis scripts.
