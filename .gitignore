@@ -1,0 +1,6 @@
+# Data folders (ignore full directories)
+DemoStats_2025_CSV_fixed/
+Geographic Hierarchy File_2025_CSV/
+HouseholdSpend_2025_CSV_fixed/
+Documentation/
+.env/
