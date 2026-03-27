@@ -33,3 +33,6 @@ env/
 .aider*
 .continue/
 .copilot/
+
+exports/
+
