@@ -4,3 +4,32 @@ Geographic Hierarchy File_2025_CSV/
 HouseholdSpend_2025_CSV_fixed/
 Documentation/
 .env/
+
+#Python 
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# jupyter artifacts
+.ipynb_checkpoints/
+
+# macOS junk
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# AI agent files
+.claude/
+.cursor/
+.aider*
+.continue/
+.copilot/
