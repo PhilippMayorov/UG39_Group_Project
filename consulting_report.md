@@ -30,10 +30,6 @@ An HBR value greater than 0.30 is widely regarded as an indicator of unaffordabl
 
 This analysis was commissioned as a graded coursework deliverable for DS 3000B. The assignment brief was issued by the course instructors and required the student group UG39 to apply machine learning techniques — spanning data preparation, unsupervised learning, and supervised learning — to proprietary data supplied by **Environics Analytics (EA)**, a leading Canadian data and analytics company. All data was provided under a Non-Disclosure Agreement (NDA) with the University of Western Ontario and is subject to legal restrictions; the data must be deleted upon course completion and may not be shared externally.
 
-### Research Team
-
-The analysis was conducted collaboratively by the members of **Group UG39**. Work was divided across modular feature branches in a shared Git repository, with each team member contributing to distinct stages of the analytical pipeline before integration into a unified deliverable.
-
 ### Data Sources
 
 All data used in this analysis was exclusively sourced from Environics Analytics. Four datasets were made available:
