@@ -10,7 +10,13 @@
 
 ## Executive Summary
 
-*[To be written last. Summarise the key findings and recommendations using the BLUF method.]*
+Housing burden is unevenly distributed across Canada in ways that aggregate statistics do not reveal. This analysis recommends deploying the XGBoost predictive model as a geographic scoring tool to identify the 9,105 dissemination areas (16.0% of the national total) where households spend more than 30% of disposable income on shelter, and to direct intervention resources accordingly.
+
+Applied to Environics Analytics HouseholdSpend 2025 data covering 56,857 Canadian dissemination areas at the PRCDDA level, this project used K-Means clustering, PCA, UMAP, an Elastic-Net GLM, XGBoost, and SHAP analysis to investigate the relationship between household spending patterns and housing burden.
+
+Three findings stand out. First, housing burden is a non-linear problem: no single spending variable carries meaningful linear signal (maximum Pearson correlation of 0.010), and XGBoost (R² = 0.638) explains roughly twice the variance of the best linear model (ElasticNet R² = 0.319). Second, the most predictive features are transportation and discretionary spending categories, not shelter variables. Four of the ten highest-importance SHAP features are transportation-related, and the top feature functions as a reverse proxy for household financial capacity. Third, extreme burden is concentrated within the typical-spending majority, not the high-spending 2.6% minority isolated by clustering. Targeting programs at high spenders would miss the households most at risk.
+
+Four recommendations follow: deploy XGBoost for neighbourhood-level risk scoring; expand the affordability metric to incorporate transportation costs; use low discretionary spending as an early-warning indicator; and target interventions at the typical-spending majority rather than spending-level proxies.
 
 ---
 
@@ -28,7 +34,7 @@ An HBR value greater than 0.30 is widely regarded as an indicator of unaffordabl
 
 ### Commissioning Party
 
-This analysis was commissioned as a graded coursework deliverable for DS 3000B. The assignment brief was issued by the course instructors and required the student group UG39 to apply machine learning techniques spanning data preparation, unsupervised learning, and supervised learning to proprietary data supplied by **Environics Analytics (EA)**, a leading Canadian data and analytics company. All data was provided under a Non-Disclosure Agreement (NDA) with the University of Western Ontario and is subject to legal restrictions; the data must be deleted upon course completion and may not be shared externally.
+This analysis was commissioned as a graded deliverable for DS 3000B at the University of Western Ontario, requiring group UG39 to apply machine learning to proprietary data supplied by **Environics Analytics (EA)**. All data was provided under a Non-Disclosure Agreement and must be deleted upon course completion.
 
 ### Data Sources
 
@@ -44,8 +50,6 @@ All data used in this analysis was exclusively sourced from Environics Analytics
 After filtering to the PRCDDA geographic level, the working dataset comprised approximately **44,000+ dissemination area observations**, each described by several hundred spending variables spanning food, transportation, recreation, health care, household operations, and other expenditure categories.
 
 ### Initial Assumptions and Data Exclusions
-
-Several key assumptions and exclusions were established prior to modelling to ensure methodological integrity:
 
 - **Target leakage prevention:** All shelter expenditure sub-items (`HSSH*` columns) were excluded from the predictor set, as these are components of the target variable (HBR) and their inclusion would constitute direct data leakage. Similarly, aggregate income and expenditure summary variables (`HSAGDISPIN`, `HSAGDISCIN`, `HSHNIAGG`, `HSTT001`, `HSTE001`, `HSTX001`, `HSTC001`) were removed.
 - **Invalid observations:** Dissemination areas where household disposable income was reported as zero were excluded, as HBR is undefined in these cases. No missing values were found in the remaining dataset following geographic filtering.
@@ -68,41 +72,13 @@ Model performance was assessed using R² on the held-out test set and bootstrapp
 
 ## Key Facts and Business Context
 
-### The 30% Threshold and Dataset Coverage
+### Dataset Coverage and Burden Thresholds
 
-Housing affordability research and policy in Canada uses a shelter-cost-to-income ratio of 30% as the standard threshold below which housing is considered affordable. A household spending more than 30% of its disposable income on shelter costs is classified as housing cost-burdened. A household spending more than 50% is classified as severely burdened. This is the threshold that the HBR metric operationalises in this analysis at the dissemination area level.
-
-The Environics Analytics dataset used in this project covers **56,857 dissemination areas** across all Canadian provinces and territories after filtering to the PRCDDA geographic level and removing observations where household disposable income is zero. This represents a near-complete picture of Canadian residential geography at its finest census unit. Across this dataset, the mean HBR is **0.2571** and the median is **0.2514**, indicating that the typical Canadian dissemination area sits just below the 30% affordability threshold. The distribution is, however, heavily right-skewed: the minimum HBR observed is 0.1169 and the maximum is 4.4942, confirming that while the majority of areas are below the threshold, a tail of severely burdened areas pulls the distribution far to the right.
-
-### Burden Thresholds Across Dissemination Areas
-
-Applying the standard 30% threshold directly to the dataset, **9,105 dissemination areas (16.0%)** have an HBR above 0.30, meaning that in these areas the average household spends more than 30 cents of every dollar of disposable income on shelter. A smaller subset of **148 dissemination areas (0.3%)** have an HBR above 0.50, representing areas of severe burden where shelter alone consumes the majority of disposable income. These areas are the highest-priority candidates for targeted housing intervention and are the cases where predictive modelling is most operationally valuable.
+The dataset covers **56,857 dissemination areas** across all Canadian provinces and territories, with a mean HBR of **0.2571** and a median of **0.2514**. The typical dissemination area therefore sits just below the standard 30% affordability threshold, but the distribution is heavily right-skewed (minimum 0.1169, maximum 4.4942), confirming a significant tail of severely burdened areas. Applying the threshold directly, **9,105 dissemination areas (16.0%)** have an HBR above 0.30 and **148 (0.3%)** have an HBR above 0.50, representing areas of severe burden where shelter consumes the majority of disposable income.
 
 ### Provincial Variation
 
-Affordability burden is not distributed evenly across Canada. The table below shows mean HBR, median HBR, and the proportion of dissemination areas exceeding the 30% and 50% thresholds by province and territory, sorted by mean HBR:
-
-| Province / Territory | DAs | Mean HBR | Median HBR | % DAs > 0.30 | % DAs > 0.50 |
-|---|---|---|---|---|---|
-| British Columbia | 7,607 | 0.2895 | 0.2824 | 34.5% | 0.7% |
-| Ontario | 20,305 | 0.2738 | 0.2671 | 22.6% | 0.2% |
-| Alberta | 6,125 | 0.2605 | 0.2540 | 14.9% | 0.3% |
-| Saskatchewan | 2,374 | 0.2500 | 0.2361 | 11.9% | 0.9% |
-| Manitoba | 2,146 | 0.2416 | 0.2348 | 8.7% | 0.2% |
-| Nova Scotia | 1,654 | 0.2328 | 0.2253 | 3.6% | 0.0% |
-| Quebec | 13,618 | 0.2289 | 0.2201 | 3.0% | 0.1% |
-| New Brunswick | 1,438 | 0.2165 | 0.2077 | 1.9% | 0.0% |
-| Yukon | 69 | 0.2148 | 0.2086 | 1.4% | 0.0% |
-| Newfoundland and Labrador | 1,068 | 0.2100 | 0.2042 | 1.0% | 0.0% |
-| Northwest Territories | 93 | 0.2066 | 0.2050 | 2.2% | 0.0% |
-| Prince Edward Island | 318 | 0.2069 | 0.2004 | 0.3% | 0.0% |
-| Nunavut | 42 | 0.2061 | 0.2067 | 0.0% | 0.0% |
-
-British Columbia has the highest mean HBR at 0.2895, with 34.5% of its dissemination areas exceeding the 30% burden threshold. Ontario follows at 0.2738, with 22.6% of areas above the threshold. Together, Ontario and British Columbia account for the largest absolute count of burdened dissemination areas, driven by both their high mean HBR values and the sheer number of dissemination areas they contain (20,305 and 7,607 respectively). Quebec, despite having the second largest number of DAs (13,618), has a mean HBR of only 0.2289 and only 3.0% of its areas above the threshold, indicating significantly more affordable conditions at the neighbourhood level. The territories and Atlantic provinces are the least burdened by this measure.
-
-### Why Neighbourhood-Level Analysis Matters
-
-Provincial averages like those in the table above still conceal substantial within-province heterogeneity. A province-level mean HBR of 0.2738 for Ontario does not indicate whether burden is concentrated in specific metropolitan dissemination areas or spread evenly. Similarly, a province with a low mean can still contain individual dissemination areas with HBR values approaching or exceeding 1.0. The machine learning approach taken in this analysis operates at the PRCDDA level, which is the spatial resolution at which actual housing policy and resource allocation decisions are most actionable. This is the analytical value that national or provincial aggregate statistics alone cannot provide.
+Burden is not evenly distributed across Canada. British Columbia has the highest mean HBR (0.2895), with 34.5% of its dissemination areas above the 30% threshold. Ontario follows at a mean of 0.2738, with 22.6% of areas burdened; its large DA count of 20,305 means it contains the greatest absolute number of high-burden neighbourhoods nationally. Saskatchewan has a moderate mean HBR (0.2500) but the highest rate of severely burdened areas (0.9% above 0.50), indicating a concentrated tail risk. Quebec presents the sharpest contrast: despite being the second largest province by DA count (13,618), only 3.0% of its areas exceed the threshold, reflecting substantially more affordable neighbourhood-level conditions. These provincial differences are themselves averages that conceal within-province heterogeneity, which is the variation this analysis targets at the PRCDDA level.
 
 ---
 
@@ -140,9 +116,7 @@ The PC1 versus PC2 scatter plot, coloured by K-Means labels, shows the two clust
 
 A parameter search across n_neighbors values of 5, 15, and 50 found that n_neighbors = 5 produced the highest 2D silhouette score of 0.1288, compared to 0.0381 and -0.0550 at the larger values. n_neighbors = 5 was therefore used for the final embedding.
 
-The UMAP plot shows Cluster 0 forming dense, curved manifold structures across the 2D embedding, while Cluster 1 appears as scattered points distributed throughout rather than forming a compact region. This reflects how UMAP preserves local neighbourhood structure, as the small minority cluster does not project into a single tight area.
-
-The high-dimensional silhouette score (0.8137) is substantially higher than the UMAP silhouette (0.1288). This gap is expected: the high-dimensional score measures separation using the same Euclidean distances K-Means optimised, so it naturally reflects strong cluster quality. UMAP's non-linear compression introduces distortion, particularly for a small cluster like Cluster 1. The high-dimensional silhouette score is the more reliable measure of clustering quality in this analysis.
+The UMAP plot shows Cluster 0 forming dense, curved manifold structures across the 2D embedding, while Cluster 1 appears as scattered points distributed throughout rather than forming a compact region. This reflects how UMAP preserves local neighbourhood structure, as the small minority cluster does not project into a single tight area. The high-dimensional silhouette score (0.8137) is the more reliable measure of clustering quality here, as UMAP's non-linear compression introduces distortion when projecting a small, dispersed minority cluster into two dimensions.
 
 ---
 
@@ -154,19 +128,7 @@ Because HBR is right-skewed and bounded, the target was transformed prior to mod
 
 GridSearchCV with 5-fold cross-validation was run over five alpha values in [10⁻⁴, 1] and five l1_ratio values in [0, 1]. The best configuration was **pure Ridge regression (l1_ratio = 0.0)**, meaning no sparsity was introduced and all 316 features received non-zero coefficients. This outcome is consistent with the multicollinearity observed in EDA, where Ridge spreads weight across correlated features rather than zeroing any out.
 
-On the test set, the ElasticNet achieved an **R² of 0.3187** with a bootstrapped 95% confidence interval of [0.1772, 0.5476]. The scatterplot of predicted versus actual values shows the model captures the central tendency of low-burden households but struggles with the extreme outliers, consistent with the right-skewed distribution.
-
-The five largest coefficients by magnitude are:
-
-| Feature | Description | Coefficient |
-|---|---|---|
-| HSHF004 | Rugs, mats and under-padding | -2.08 |
-| HSFD995 | Restaurant snacks and beverages | +1.96 |
-| HSHO001 | Household operations | +1.90 |
-| HSHO022 | Other household supplies | +1.72 |
-| HSFD990 | Food purchased from restaurants | -1.67 |
-
-The negative sign on HSHF004 suggests households spending on furnishings are likely homeowners with sufficient disposable income, and are therefore associated with lower burden. The opposing signs on HSFD995 and HSFD990, which are two restaurant-related variables, likely reflect a multicollinearity artefact. Ridge regression splits weight between correlated predictors in ways that can destabilise individual coefficient directions rather than eliminating one.
+On the test set, the ElasticNet achieved an **R² of 0.3187** with a bootstrapped 95% confidence interval of [0.1772, 0.5476]. The largest coefficients include furnishing expenditure (negative, indicating homeowner financial stability) and household operations (positive), though opposing signs on correlated restaurant-spending variables indicate a Ridge multicollinearity artefact rather than a true directional effect.
 
 #### 3b. XGBoost
 
@@ -195,9 +157,7 @@ SHAP TreeExplainer was applied to the best XGBoost model on the test set. The to
 
 Transportation features account for 4 of the top 10, confirming that mobility-related costs are the strongest category of predictors for housing burden. The top feature, HSRV003B (snowmobile purchases), functions as a financial-capacity proxy. Households with low values on this variable, indicating they cannot afford discretionary recreational spending, are consistently associated with higher predicted HBR, while households with high values show reduced predicted burden. A similar pattern holds for HSHO002 and HSHE012C, where lower discretionary spending acts as a reverse proxy for household financial health.
 
-HSMG010 (alimony and child support) reflects a different mechanism. Fixed legal obligations of this kind reduce the disposable budget available for housing and the variable shows a non-linear SHAP relationship consistent with threshold-like budget pressure effects. Transit-related features including HSTR051, HSTR055, and HSTR038 show the opposite direction: higher spending on commuting and transit is associated with higher predicted burden, consistent with households in high-cost areas relying on public transport.
-
-SHAP dependence plots confirm these relationships are non-linear. HSRV003B shows a strong decreasing curve where the model's response is not uniform across the feature's range. HSMG010 shows a heterogeneous pattern with clear threshold behaviour. These non-linear shapes cannot be captured by the ElasticNet coefficients, which are constrained to a single linear direction per feature.
+HSMG010 (alimony and child support) captures a distinct mechanism: fixed legal obligations reduce the disposable budget available for housing. Transit features (HSTR051, HSTR055, HSTR038) show the opposite direction, where higher commuting costs are associated with higher predicted burden, consistent with households in high-cost areas relying on public transport.
 
 Critically, there is **zero overlap** between the top 10 SHAP features and the top 10 ElasticNet coefficients. This divergence, combined with the R² gap of +0.3193, provides strong evidence that housing burden prediction is a substantially non-linear problem. The two models are identifying entirely different predictive structures in the data, and the non-linear model accounts for roughly twice the variance.
 
@@ -221,12 +181,4 @@ To help identify financially stressed households before they appear in arrears o
 
 To help ensure that affordability programs reach the households most in need, we recommend against using overall spending level as the primary criterion for program eligibility or prioritisation. The K-Means analysis produced a clear binary split: a high-spending minority (Cluster 1, approximately 2.6% of dissemination areas) with expenditure five to seven times that of the majority, and a broad typical majority (Cluster 0, approximately 97.4%). Critically, nearly all extreme HBR outliers (HBR above 1.0) fall within Cluster 0, not within the high-spending group. Housing burden is concentrated in the ordinary-spending majority, and any screening approach that uses high spending as a signal of vulnerability will systematically miss the households that are most at risk.
 
-### R5. Supplement Expenditure Data to Improve Prediction of Extreme Cases
-
-To help close the performance gap on the most severely burdened households, we recommend augmenting the Environics Analytics expenditure dataset with administrative or survey sources that specifically oversample high-burden cases. Both the ElasticNet and XGBoost models underpredict at the extreme upper tail of the HBR distribution, and the bootstrapped confidence intervals for both models are wide, reflecting limited training signal in the right tail. The target variable has a skewness of 15.41, meaning extreme observations are rare relative to the overall dataset of 57,936 dissemination areas. These rare cases are precisely where intervention is most urgent. Adding targeted data sources such as Statistics Canada's Survey of Household Spending or linked administrative housing data would provide denser signal at high HBR values and is expected to improve model accuracy where it matters most.
-
 ---
-
-## Appendices
-
-*[To be completed. Include supplementary tables, extended model outputs, variable lists, or any supporting material referenced in the main body.]*
