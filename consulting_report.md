@@ -68,7 +68,41 @@ Model performance was assessed using R² on the held-out test set and bootstrapp
 
 ## Key Facts and Business Context
 
-*[To be completed. Include standout quantitative statistics, the housing affordability landscape in Canada, and why this analysis is relevant to policymakers or stakeholders.]*
+### The 30% Threshold and Dataset Coverage
+
+Housing affordability research and policy in Canada uses a shelter-cost-to-income ratio of 30% as the standard threshold below which housing is considered affordable. A household spending more than 30% of its disposable income on shelter costs is classified as housing cost-burdened. A household spending more than 50% is classified as severely burdened. This is the threshold that the HBR metric operationalises in this analysis at the dissemination area level.
+
+The Environics Analytics dataset used in this project covers **56,857 dissemination areas** across all Canadian provinces and territories after filtering to the PRCDDA geographic level and removing observations where household disposable income is zero. This represents a near-complete picture of Canadian residential geography at its finest census unit. Across this dataset, the mean HBR is **0.2571** and the median is **0.2514**, indicating that the typical Canadian dissemination area sits just below the 30% affordability threshold. The distribution is, however, heavily right-skewed: the minimum HBR observed is 0.1169 and the maximum is 4.4942, confirming that while the majority of areas are below the threshold, a tail of severely burdened areas pulls the distribution far to the right.
+
+### Burden Thresholds Across Dissemination Areas
+
+Applying the standard 30% threshold directly to the dataset, **9,105 dissemination areas (16.0%)** have an HBR above 0.30, meaning that in these areas the average household spends more than 30 cents of every dollar of disposable income on shelter. A smaller subset of **148 dissemination areas (0.3%)** have an HBR above 0.50, representing areas of severe burden where shelter alone consumes the majority of disposable income. These areas are the highest-priority candidates for targeted housing intervention and are the cases where predictive modelling is most operationally valuable.
+
+### Provincial Variation
+
+Affordability burden is not distributed evenly across Canada. The table below shows mean HBR, median HBR, and the proportion of dissemination areas exceeding the 30% and 50% thresholds by province and territory, sorted by mean HBR:
+
+| Province / Territory | DAs | Mean HBR | Median HBR | % DAs > 0.30 | % DAs > 0.50 |
+|---|---|---|---|---|---|
+| British Columbia | 7,607 | 0.2895 | 0.2824 | 34.5% | 0.7% |
+| Ontario | 20,305 | 0.2738 | 0.2671 | 22.6% | 0.2% |
+| Alberta | 6,125 | 0.2605 | 0.2540 | 14.9% | 0.3% |
+| Saskatchewan | 2,374 | 0.2500 | 0.2361 | 11.9% | 0.9% |
+| Manitoba | 2,146 | 0.2416 | 0.2348 | 8.7% | 0.2% |
+| Nova Scotia | 1,654 | 0.2328 | 0.2253 | 3.6% | 0.0% |
+| Quebec | 13,618 | 0.2289 | 0.2201 | 3.0% | 0.1% |
+| New Brunswick | 1,438 | 0.2165 | 0.2077 | 1.9% | 0.0% |
+| Yukon | 69 | 0.2148 | 0.2086 | 1.4% | 0.0% |
+| Newfoundland and Labrador | 1,068 | 0.2100 | 0.2042 | 1.0% | 0.0% |
+| Northwest Territories | 93 | 0.2066 | 0.2050 | 2.2% | 0.0% |
+| Prince Edward Island | 318 | 0.2069 | 0.2004 | 0.3% | 0.0% |
+| Nunavut | 42 | 0.2061 | 0.2067 | 0.0% | 0.0% |
+
+British Columbia has the highest mean HBR at 0.2895, with 34.5% of its dissemination areas exceeding the 30% burden threshold. Ontario follows at 0.2738, with 22.6% of areas above the threshold. Together, Ontario and British Columbia account for the largest absolute count of burdened dissemination areas, driven by both their high mean HBR values and the sheer number of dissemination areas they contain (20,305 and 7,607 respectively). Quebec, despite having the second largest number of DAs (13,618), has a mean HBR of only 0.2289 and only 3.0% of its areas above the threshold, indicating significantly more affordable conditions at the neighbourhood level. The territories and Atlantic provinces are the least burdened by this measure.
+
+### Why Neighbourhood-Level Analysis Matters
+
+Provincial averages like those in the table above still conceal substantial within-province heterogeneity. A province-level mean HBR of 0.2738 for Ontario does not indicate whether burden is concentrated in specific metropolitan dissemination areas or spread evenly. Similarly, a province with a low mean can still contain individual dissemination areas with HBR values approaching or exceeding 1.0. The machine learning approach taken in this analysis operates at the PRCDDA level, which is the spatial resolution at which actual housing policy and resource allocation decisions are most actionable. This is the analytical value that national or provincial aggregate statistics alone cannot provide.
 
 ---
 
